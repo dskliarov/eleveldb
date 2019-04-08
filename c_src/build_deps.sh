@@ -10,7 +10,7 @@ unset POSIX_SHELL # clear it so if we invoke other scripts, they run as ksh as w
 
 LEVELDB_VSN=""
 
-SNAPPY_VSN="1.0.4"
+SNAPPY_VSN="1.1.7"
 
 set -e
 
@@ -56,20 +56,23 @@ case "$1" in
 
     get-deps)
         if [ ! -d leveldb ]; then
-            git clone git://github.com/basho/leveldb
-            (cd leveldb && git checkout $LEVELDB_VSN)
-            if [ "$BASHO_EE" = "1" ]; then
-                (cd leveldb && git submodule update --init)
-            fi
+            tar -xzf leveldb.tar.gz
+            (cd leveldb && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build .)
+            #git clone git://github.com/basho/leveldb
+            #(cd leveldb && )
+            #if [ "$BASHO_EE" = "1" ]; then
+            #    (cd leveldb && git submodule update --init)
+            #fi
         fi
         ;;
 
     *)
         export MACOSX_DEPLOYMENT_TARGET=10.8
 
-        if [ ! -d snappy-$SNAPPY_VSN ]; then
+        if [ ! -d snappy ]; then
             tar -xzf snappy-$SNAPPY_VSN.tar.gz
-            (cd snappy-$SNAPPY_VSN && ./configure --disable-shared --prefix=$BASEDIR/system --libdir=$BASEDIR/system/lib --with-pic)
+            (cd snappy && mkdir -p build && cd build && cmake ../ && make)
+            # (cd snappy-$SNAPPY_VSN && ./configure --disable-shared --prefix=$BASEDIR/system --libdir=$BASEDIR/system/lib --with-pic)
         fi
 
         if [ ! -f system/lib/libsnappy.a ]; then
