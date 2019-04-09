@@ -75,9 +75,10 @@ case "$1" in
             # (cd snappy-$SNAPPY_VSN && ./configure --disable-shared --prefix=$BASEDIR/system --libdir=$BASEDIR/system/lib --with-pic)
         fi
 
-        if [ ! -f system/lib/libsnappy.a ]; then
-            (cd snappy-$SNAPPY_VSN && $MAKE && $MAKE install)
-        fi
+        #if [ ! -f build/libsnappy.a ]; then
+        #    (cd snappy/build &&  make)
+            #(cd snappy-$SNAPPY_VSN && $MAKE && $MAKE install)
+        #fi
 
         export CFLAGS="$CFLAGS -I $BASEDIR/system/include"
         export CXXFLAGS="$CXXFLAGS -I $BASEDIR/system/include"
@@ -86,12 +87,22 @@ case "$1" in
         export LEVELDB_VSN="$LEVELDB_VSN"
 
         if [ ! -d leveldb ]; then
-            git clone git://github.com/basho/leveldb
-            (cd leveldb && git checkout $LEVELDB_VSN)
-            if [ $BASHO_EE = "1" ]; then
-                (cd leveldb && git submodule update --init)
-            fi
+            tar -xzf leveldb.tar.gz
+            (cd leveldb && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build .)
+            #git clone git://github.com/basho/leveldb
+            #(cd leveldb && )
+            #if [ "$BASHO_EE" = "1" ]; then
+            #    (cd leveldb && git submodule update --init)
+            #fi
         fi
+
+        #if [ ! -d leveldb ]; then
+            #git clone git://github.com/basho/leveldb
+            #(cd leveldb && git checkout $LEVELDB_VSN)
+            #if [ $BASHO_EE = "1" ]; then
+                #(cd leveldb && git submodule update --init)
+            #fi
+        #fi
 
         # hack issue where high level make is running -j 4
         #  and causes build errors in leveldb
